@@ -92,6 +92,19 @@ where
         core::array::from_fn(|i| ShiftRegisterPin::<'_, Pin1, Pin2, Pin3, N>::new(self, i))
     }
 
+    /// Modify all the values in one go
+    ///
+    /// Modify the passed-in slice to the values you want the shift register(s)
+    /// to have. `true` means high and `false` means low.
+    pub fn modify<F>(&self, fun: F) -> Result<(), SRErr<Pin1, Pin2, Pin3>>
+        where F: FnOnce(&mut [bool; N])
+    {
+        let mut output_state = self.output_state.borrow_mut();
+        fun(&mut output_state);
+        drop(output_state);
+        self.send_value()
+    }
+
     /// Consume the shift register and return the original clock, latch, and data output pins
     pub fn release(self) -> (Pin1, Pin2, Pin3) {
         let Self {
