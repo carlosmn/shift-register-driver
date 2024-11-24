@@ -103,16 +103,10 @@ where
         (clock.into_inner(), latch.into_inner(), data.into_inner())
     }
 
-    fn update(
-        &self,
-        index: usize,
-        command: bool,
-    ) -> Result<
-        (),
-        SRErr<Pin1, Pin2, Pin3>,
-    > {
-        self.output_state.borrow_mut()[index] = command;
+    /// Send out the data to the shift registers
+    fn send_value(&self) -> Result<(), SRErr<Pin1, Pin2, Pin3>> {
         let output_state = self.output_state.borrow();
+
         self.latch
             .borrow_mut()
             .set_low()
@@ -145,6 +139,18 @@ where
             .set_high()
             .map_err(SRError::LatchPinError)?;
         Ok(())
+    }
+
+    fn update(
+        &self,
+        index: usize,
+        command: bool,
+    ) -> Result<
+        (),
+        SRErr<Pin1, Pin2, Pin3>,
+    > {
+        self.output_state.borrow_mut()[index] = command;
+        self.send_value()
     }
 }
 
