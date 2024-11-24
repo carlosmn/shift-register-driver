@@ -88,6 +88,9 @@ where
     }
 
     /// Get embedded-hal output pins to control the shift register outputs
+    ///
+    /// Use this if you intend to use the shift register as an output
+    /// multiplexer and want to treat the outputs as regular pins.
     pub fn decompose(&self) -> [ShiftRegisterPin<'_, Pin1, Pin2, Pin3, N>; N] {
         core::array::from_fn(|i| ShiftRegisterPin::<'_, Pin1, Pin2, Pin3, N>::new(self, i))
     }
